@@ -6,6 +6,6 @@ namespace ASP.NET_CORE_API.Repository
     {
         Task<ServiceResponse1<object>> register(AccountModel accmodel);
         Task<ServiceResponse<object>> selectALLregister();
-        Task<ServiceResponse<object>> getUserLogin(string username);
+        Task<ServiceResponse<object>> getUserLogin(object cred);
     }
 }

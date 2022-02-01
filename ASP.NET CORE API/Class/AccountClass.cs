@@ -15,7 +15,7 @@ namespace ASP.NET_CORE_API.Class
             sql = new SqlConnection(config["ConnectionStrings:Account"]);
         }
 
-        public async Task<ServiceResponse<object>> getUserLogin(string username)
+        public async Task<ServiceResponse<object>> getUserLogin(object cred)
         {
             var response = new ServiceResponse<object>();
             try
@@ -23,9 +23,10 @@ namespace ASP.NET_CORE_API.Class
                 if (sql.State == System.Data.ConnectionState.Closed)
                     sql.Open();
                 var dynamic = new DynamicParameters();
+                var property = cred as Credential;
                 dynamic.Add("type", "getUser");
-                dynamic.Add("username", username);
-                //dynamic.Add("password", password);
+                dynamic.Add("username", property?.username);
+                dynamic.Add("password", property?.password);
                 dynamic.Add("isvalid", dbType: System.Data.DbType.Int32, size: 100, direction: System.Data.ParameterDirection.Output);
 
                 var res = await sql.QueryAsync<object>("usp_Account", dynamic, commandType: System.Data.CommandType.StoredProcedure);
@@ -38,13 +39,13 @@ namespace ASP.NET_CORE_API.Class
             {
                 response.code = 500;
                 response.message = "Sql Exception Error";
-                response.Data = new { stacktrace = sqlex.StackTrace, msg = sqlex.Message, sqlErrorCode = sqlex.ErrorCode };
+                response.Data = new error { stacktrace = sqlex.StackTrace, message = sqlex.Message, source = sqlex.Source };
             }
             catch (Exception ex)
             {
                 response.code = 500;
                 response.message = "Exception Error";
-                response.Data = new { stacktrace = ex.StackTrace, msg = ex.Message };
+                response.Data = new error { stacktrace = ex.StackTrace, message = ex.Message, source = ex.Source };
             }
             return response;
         }
@@ -76,15 +77,15 @@ namespace ASP.NET_CORE_API.Class
                                                         : "Username already Taken!";
                 response.code = retval.Equals(1) ? 200 : 400;
             }
-            catch (SqlException sql)
+            catch (SqlException sqlex)
             {
                 response.code = 500;
-                response.message = new { stacktrace = sql.StackTrace, msg = sql.Message, SqlErrorCode = sql.ErrorCode };
+                response.message = new error { stacktrace = sqlex.StackTrace, message = sqlex.Message, source = sqlex.Source };
             }
             catch (Exception ex)
             {
                 response.code = 500;
-                response.message = new { stacktrace = ex.StackTrace, msg = ex.Message };
+                response.message = new error { stacktrace = ex.StackTrace, message = ex.Message, source = ex.Source };
             }
             return response;
         }
@@ -108,13 +109,13 @@ namespace ASP.NET_CORE_API.Class
             {
                 response.code = 500;
                 response.message = "Sql Exception Error";
-                response.Data = new { stacktrace = sqlex.StackTrace, msg = sqlex.Message, sqlErrorCode = sqlex.ErrorCode };
+                response.Data = new error { stacktrace = sqlex.StackTrace, message = sqlex.Message, source = sqlex.Source };
             }
             catch (Exception ex)
             {
                 response.code = 500;
                 response.message = "Exception Error";
-                response.Data = new { stacktrace = ex.StackTrace, msg = ex.Message };
+                response.Data = new error { stacktrace = ex.StackTrace, message = ex.Message, source = ex.Source };
             }
             return response;
         }

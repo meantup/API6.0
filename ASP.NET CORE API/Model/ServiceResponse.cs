@@ -11,4 +11,10 @@
         public int code { get; set; }
         public T? message { get; set; }
     }
+    public class error
+    {
+        public string? stacktrace { get; set; }
+        public string? message { get; set; } 
+        public string? source { get; set; } 
+    }
 }
